@@ -1,0 +1,7 @@
+     ##################
+     # Xential Plugin #
+     ##################
+
+${AnsiColor.BRIGHT_BLUE}:: Ritense ::
+:: Running Spring Boot ${spring-boot.version} ::
+:: https://ritense.com ::${AnsiColor.DEFAULT} ::
