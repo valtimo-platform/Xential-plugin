@@ -19,23 +19,29 @@ import {XentialConfigurationComponent} from './components/xential-configuration/
 import {XENTIAL_PLUGIN_LOGO_BASE64} from './assets';
 
 const XentialPluginSpecification: PluginSpecification = {
-  pluginId: 'xential',
-  pluginConfigurationComponent: XentialConfigurationComponent,
-  pluginLogoBase64: XENTIAL_PLUGIN_LOGO_BASE64,
-  pluginTranslations: {
-    nl: {
-      title: 'Xential',
-      description: 'Xential plugin',
+    pluginId: 'xential',
+    pluginConfigurationComponent: XentialConfigurationComponent,
+    pluginLogoBase64: XENTIAL_PLUGIN_LOGO_BASE64,
+    pluginTranslations: {
+        nl: {
+            title: 'Xential',
+            description: 'Xential plugin',
+            configurationTitle: 'Configuratie naam',
+            clientId: 'Client ID',
+        },
+        en: {
+            title: 'Xential',
+            description: 'Xential plugin',
+            configurationTitle: 'Configuration name',
+            clientId: 'Client ID',
+        },
+        de: {
+            title: 'Xential',
+            description: 'Xential plugin',
+            configurationTitle: 'Konfigurationsname',
+            clientId: 'Client ID',
+        },
     },
-    en: {
-      title: 'Xential',
-      description: 'Xential plugin',
-    },
-    de: {
-      title: 'Xential',
-      description: 'Xential plugin',
-    },
-  },
 };
 
 export {XentialPluginSpecification};

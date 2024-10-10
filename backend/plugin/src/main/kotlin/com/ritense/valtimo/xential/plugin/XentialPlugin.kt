@@ -17,6 +17,7 @@
 package com.ritense.valtimo.xential.plugin
 
 import com.ritense.plugin.annotation.Plugin
+import com.ritense.plugin.annotation.PluginProperty
 
 @Plugin(
     key = "xential",
@@ -25,5 +26,8 @@ import com.ritense.plugin.annotation.Plugin
 )
 class XentialPlugin(
 ) {
+
+    @PluginProperty(key = "clientId", secret = false)
+    private lateinit var clientId: String
 
 }

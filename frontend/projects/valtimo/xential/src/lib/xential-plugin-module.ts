@@ -18,13 +18,13 @@ import {NgModule} from '@angular/core';
 import {XentialConfigurationComponent} from './components/xential-configuration/xential-configuration.component';
 import {CommonModule} from '@angular/common';
 import {PluginTranslatePipeModule} from '@valtimo/plugin';
-import {FormModule, InputModule, ParagraphModule} from '@valtimo/components';
+import {FormModule, InputModule} from '@valtimo/components';
 
 @NgModule({
   declarations: [
     XentialConfigurationComponent,
   ],
-  imports: [CommonModule, PluginTranslatePipeModule, FormModule, InputModule, ParagraphModule],
+  imports: [CommonModule, PluginTranslatePipeModule, FormModule, InputModule],
   exports: [
     XentialConfigurationComponent,
   ],

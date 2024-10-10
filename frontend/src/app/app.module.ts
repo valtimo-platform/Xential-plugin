@@ -18,7 +18,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {Injector, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HttpBackend, HttpClientModule} from '@angular/common/http';
-import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {LayoutModule} from '@valtimo/layout';
 import {TaskModule} from '@valtimo/task';
@@ -84,7 +83,6 @@ export function tabsFactory() {
     HttpClientModule,
     CommonModule,
     BrowserModule,
-    AppRoutingModule,
     LayoutModule,
     CardModule,
     WidgetModule,
