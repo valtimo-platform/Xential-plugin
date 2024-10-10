@@ -17,7 +17,11 @@
 package com.ritense.valtimo.xential.plugin
 
 import com.ritense.plugin.annotation.Plugin
+import com.ritense.plugin.annotation.PluginAction
 import com.ritense.plugin.annotation.PluginProperty
+import com.ritense.processlink.domain.ActivityTypeWithEventName
+import com.ritense.valtimo.xential.model.GenerateDocumentProperties
+import org.camunda.bpm.engine.delegate.DelegateExecution
 
 @Plugin(
     key = "xential",
@@ -29,5 +33,15 @@ class XentialPlugin(
 
     @PluginProperty(key = "clientId", secret = false)
     private lateinit var clientId: String
+
+    @PluginAction(
+        key = "generate-document",
+        title = "Generate document",
+        description = "Generate a document using xential.",
+        activityTypes = [ActivityTypeWithEventName.SERVICE_TASK_START]
+    )
+    fun generateDocument(execution: DelegateExecution, generateDocumentProperties: GenerateDocumentProperties) {
+        println("$clientId, $generateDocumentProperties")
+    }
 
 }

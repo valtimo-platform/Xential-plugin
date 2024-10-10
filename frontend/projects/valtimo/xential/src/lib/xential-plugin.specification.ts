@@ -17,29 +17,50 @@
 import {PluginSpecification} from '@valtimo/plugin';
 import {XentialConfigurationComponent} from './components/xential-configuration/xential-configuration.component';
 import {XENTIAL_PLUGIN_LOGO_BASE64} from './assets';
+import {
+    GenerateDocumentConfigurationComponent
+} from "./components/generate-document-configuration/generate-document-configuration.component";
 
 const XentialPluginSpecification: PluginSpecification = {
     pluginId: 'xential',
     pluginConfigurationComponent: XentialConfigurationComponent,
     pluginLogoBase64: XENTIAL_PLUGIN_LOGO_BASE64,
+    functionConfigurationComponents: {
+        'generate-document': GenerateDocumentConfigurationComponent
+    },
     pluginTranslations: {
         nl: {
             title: 'Xential',
             description: 'Xential plugin',
             configurationTitle: 'Configuratie naam',
             clientId: 'Client ID',
+            'generate-document': 'Genereer document',
+            templateId: 'Template ID',
+            fileFormat: 'Bestandsformaat',
+            documentId: 'Document kenmerk',
+            templateData: 'Sjabloon vuldata',
         },
         en: {
             title: 'Xential',
             description: 'Xential plugin',
             configurationTitle: 'Configuration name',
             clientId: 'Client ID',
+            'generate-document': 'Generate document',
+            templateId: 'Sjabloon ID',
+            fileFormat: 'File format',
+            documentId: 'Document ID',
+            templateData: 'Template data',
         },
         de: {
             title: 'Xential',
             description: 'Xential plugin',
             configurationTitle: 'Konfigurationsname',
             clientId: 'Client ID',
+            'generate-document': 'Dokument generieren',
+            templateId: 'Vorlage ID',
+            fileFormat: 'Dateiformat',
+            documentId: 'Dokument-ID',
+            templateData: 'Vorlagendaten',
         },
     },
 };
