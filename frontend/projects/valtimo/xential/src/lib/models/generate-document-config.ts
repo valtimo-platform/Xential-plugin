@@ -5,6 +5,6 @@ interface GenerateDocumentConfig {
     templateData: Array<{key: string; value: string}>
 }
 
-type FileFormat = 'DOCX' | 'PDF' | 'XML' | 'HTML';
+type FileFormat = 'WORD' | 'PDF';
 
 export {GenerateDocumentConfig, FileFormat}

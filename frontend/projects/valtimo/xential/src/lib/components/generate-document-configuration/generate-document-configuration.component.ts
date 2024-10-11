@@ -18,7 +18,7 @@ export class GenerateDocumentConfigurationComponent implements FunctionConfigura
         new EventEmitter<GenerateDocumentConfig>();
 
     public fileFormats$ = new BehaviorSubject<SelectItem[]>(
-        ['DOCX', 'HTML', 'PDF', 'XML']
+        ['WORD', 'PDF']
             .map(format => {
                 return {
                     id: format,

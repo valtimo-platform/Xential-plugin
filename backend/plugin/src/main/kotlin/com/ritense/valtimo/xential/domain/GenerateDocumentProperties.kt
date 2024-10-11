@@ -1,12 +1,14 @@
-package com.ritense.valtimo.xential.model
+package com.ritense.valtimo.xential.domain
+
+import java.util.UUID
 
 data class GenerateDocumentProperties(
-    val templateId: String,
+    val templateId: UUID,
     val fileFormat: FileFormat,
     val documentId: String,
     val templateData: Map<String, String>
 )
 
 enum class FileFormat {
-    DOCX, HTML, PDF, XML
+    WORD, PDF
 }

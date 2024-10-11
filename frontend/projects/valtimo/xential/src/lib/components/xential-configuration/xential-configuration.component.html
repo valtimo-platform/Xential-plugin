@@ -37,4 +37,11 @@
             [defaultValue]="obs.prefill?.clientId"
             [title]="'clientId' | pluginTranslate: pluginId | async">
     </v-input>
+    <v-input
+            type="text"
+            required="true"
+            name="clientPassword"
+            [defaultValue]="obs.prefill?.clientPassword"
+            [title]="'clientPassword' | pluginTranslate: pluginId | async">
+    </v-input>
 </v-form>

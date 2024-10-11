@@ -17,21 +17,64 @@
 package com.ritense.valtimo.xential.autoconfiguration
 
 import com.ritense.plugin.service.PluginService
-import com.ritense.resource.service.TemporaryResourceStorageService
+import com.ritense.valtimo.contract.config.LiquibaseMasterChangeLogLocation
 import com.ritense.valtimo.xential.plugin.XentialPluginFactory
+import com.ritense.valtimo.xential.repository.XentialTokenRepository
+import com.ritense.valtimo.xential.service.DocumentGenerationService
+import com.rotterdam.xential.api.DefaultApi
+import org.openapitools.client.infrastructure.ApiClient
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.annotation.Bean
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.web.reactive.function.client.WebClient
 
 @AutoConfiguration
+@EnableJpaRepositories(basePackages = ["com.ritense.valtimo.xential.repository"])
+@EntityScan("com.ritense.valtimo.xential.domain")
 class XentialAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(XentialPluginFactory::class)
     fun xentialPluginFactory(
         pluginService: PluginService,
+        documentGenerationService: DocumentGenerationService
     ): XentialPluginFactory {
-        return XentialPluginFactory(pluginService)
+        return XentialPluginFactory(
+            pluginService,
+            documentGenerationService,
+        )
     }
+
+    @Bean
+    @ConditionalOnMissingBean(name = ["xentialLiquibaseMasterChangeLogLocation"])
+    fun xentialLiquibaseMasterChangeLogLocation(): LiquibaseMasterChangeLogLocation {
+        return LiquibaseMasterChangeLogLocation("config/liquibase/xential-plugin-master.xml")
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    fun defaultApi(): DefaultApi {
+        return DefaultApi()
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    fun apiClient(
+        @Value("plugin.xential.baseurl")
+        baseUrl: String,
+    ) = ApiClient(baseUrl)
+
+    @Bean
+    @ConditionalOnMissingBean
+    fun documentGenerationService(
+        defaultApi: DefaultApi,
+        xentialTokenRepository: XentialTokenRepository
+    ) = DocumentGenerationService(
+        defaultApi,
+        xentialTokenRepository,
+    )
 
 }
