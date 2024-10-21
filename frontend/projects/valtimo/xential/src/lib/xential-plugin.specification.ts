@@ -40,6 +40,8 @@ const XentialPluginSpecification: PluginSpecification = {
             fileFormat: 'Bestandsformaat',
             documentId: 'Document kenmerk',
             templateData: 'Sjabloon vuldata',
+            zakenApiPluginConfiguration: "Zaken API plugin",
+            documentenApiPluginConfiguration: "documenten API plugin",
         },
         en: {
             title: 'Xential',
@@ -52,6 +54,8 @@ const XentialPluginSpecification: PluginSpecification = {
             fileFormat: 'File format',
             documentId: 'Document ID',
             templateData: 'Template data',
+            zakenApiPluginConfiguration: "Zaken API plugin",
+            documentenApiPluginConfiguration: "documenten API plugin",
         },
         de: {
             title: 'Xential',
@@ -64,6 +68,8 @@ const XentialPluginSpecification: PluginSpecification = {
             fileFormat: 'Dateiformat',
             documentId: 'Dokument-ID',
             templateData: 'Vorlagendaten',
+            zakenApiPluginConfiguration: "Zaken API plugin",
+            documentenApiPluginConfiguration: "documenten API plugin",
         },
     },
 };

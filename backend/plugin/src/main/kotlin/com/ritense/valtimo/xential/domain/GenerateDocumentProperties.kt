@@ -6,9 +6,6 @@ data class GenerateDocumentProperties(
     val templateId: UUID,
     val fileFormat: FileFormat,
     val documentId: String,
+    val messageName: String,
     val templateData: Map<String, String>
 )
-
-enum class FileFormat {
-    WORD, PDF
-}

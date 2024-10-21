@@ -45,6 +45,8 @@ dependencies {
     implementation "com.ritense.valtimo:process-document:${valtimoVersion}"
     implementation "com.ritense.valtimo:plugin:${valtimoVersion}"
     implementation "com.ritense.valtimo:plugin-valtimo:${valtimoVersion}"
+    implementation "com.ritense.valtimo:objecten-api-authentication:${valtimoVersion}"
+    implementation "com.ritense.valtimo:zgw:${valtimoVersion}"
     implementation "com.ritense.valtimo:web:${valtimoVersion}"
 
     implementation "io.github.microutils:kotlin-logging:3.0.5"
@@ -54,4 +56,17 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+bootRun {
+    doFirst {
+        File f = file(".env.properties")
+        if (f.isFile()) {
+            def props = new Properties()
+            f.withInputStream { props.load(it) }
+            props.each { key, value ->
+                environment key.toString(), value.toString()
+            }
+        }
+    }
 }

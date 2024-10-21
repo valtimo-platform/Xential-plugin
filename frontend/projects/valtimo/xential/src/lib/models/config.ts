@@ -19,6 +19,8 @@ import {PluginConfigurationData} from '@valtimo/plugin';
 interface XentialConfig extends PluginConfigurationData {
     clientId: string;
     clientPassword: string;
+    zakenApiPluginConfiguration: string;
+    documentenApiPluginConfiguration: string
 }
 
 export {XentialConfig};

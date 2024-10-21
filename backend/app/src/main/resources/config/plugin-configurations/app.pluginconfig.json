@@ -1,0 +1,65 @@
+[
+    {
+        "id": "b609a0a3-886e-4b3d-ae0d-c01effb311ee",
+        "title": "OpenZaak Authentication",
+        "pluginDefinitionKey": "openzaak",
+        "properties": {
+            "clientId": "${OPEN_ZAAK_CLIENT_ID}",
+            "clientSecret": "${OPEN_ZAAK_CLIENT_SECRET}"
+        }
+    },
+    {
+        "id": "3079d6fe-42e3-4f8f-a9db-52ce2507b7ee",
+        "title": "Zaken API",
+        "pluginDefinitionKey": "zakenapi",
+        "properties": {
+            "url": "${ZAKEN_API_URL}",
+            "authenticationPluginConfiguration": "b609a0a3-886e-4b3d-ae0d-c01effb311ee"
+        }
+    },
+    {
+        "id": "5474fe57-532a-4050-8d89-32e62ca3e895",
+        "title": "Documenten API",
+        "pluginDefinitionKey": "documentenapi",
+        "properties": {
+            "url": "${DOCUMENTEN_API_URL}",
+            "bronorganisatie": "051845623",
+            "authenticationPluginConfiguration": "b609a0a3-886e-4b3d-ae0d-c01effb311ee",
+            "apiVersion": "1.4.3"
+        }
+    },
+    {
+        "id": "21a006f9-7833-4cdf-a6b7-1927705dd543",
+        "title": "Objecten API Authentication",
+        "pluginDefinitionKey": "objecttokenauthentication",
+        "properties": {
+            "token": "${OBJECTEN_API_TOKEN}"
+        }
+    },
+    {
+        "id": "b6d83348-97e7-4660-bd35-2e5fcc9629b4",
+        "title": "Objecten API",
+        "pluginDefinitionKey": "objectenapi",
+        "properties": {
+            "url": "${OBJECTEN_API_URL}",
+            "authenticationPluginConfiguration": "21a006f9-7833-4cdf-a6b7-1927705dd543"
+        }
+    },
+    {
+        "id": "acb0687a-075e-4435-923b-e6cb01d4d5db",
+        "title": "Objecttypen API Authentication",
+        "pluginDefinitionKey": "objecttokenauthentication",
+        "properties": {
+            "token": "${OBJECTTYPEN_API_TOKEN}"
+        }
+    },
+    {
+        "id": "4021bb75-18c8-4ca5-8658-b9f9c728bba0",
+        "title": "Objecttypen API",
+        "pluginDefinitionKey": "objecttypenapi",
+        "properties": {
+            "url": "${OBJECTTYPEN_API_URL}",
+            "authenticationPluginConfiguration": "acb0687a-075e-4435-923b-e6cb01d4d5db"
+        }
+    }
+]

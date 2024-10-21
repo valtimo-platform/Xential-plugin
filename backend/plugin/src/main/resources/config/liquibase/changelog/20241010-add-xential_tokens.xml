@@ -26,6 +26,7 @@
         <createTable tableName="xential_tokens">
             <column name="token" type="uuid"/>
             <column name="process_id" type="uuid"/>
+            <column name="message_name" type="VARCHAR(256)"/>
             <column name="resume_url" type="VARCHAR(2083)"/>
         </createTable>
     </changeSet>
