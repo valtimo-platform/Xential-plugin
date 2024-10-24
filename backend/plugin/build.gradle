@@ -119,8 +119,7 @@ test {
     useJUnitPlatform()
 }
 
-sourceCompatibility = 20
-targetCompatibility = 20
+java.sourceCompatibility = JavaVersion.VERSION_22
 
 apply plugin: "com.avast.gradle.docker-compose"
 
