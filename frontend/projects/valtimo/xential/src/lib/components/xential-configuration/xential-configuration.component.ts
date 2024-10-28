@@ -16,15 +16,12 @@
 
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {PluginConfigurationComponent, PluginConfigurationData} from '@valtimo/plugin';
-import {BehaviorSubject, combineLatest, map, Observable, Subscription, take} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, Subscription, take} from 'rxjs';
 import {XentialConfig} from '../../models';
-import {PluginManagementService, PluginTranslationService} from '@valtimo/plugin';
-import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'valtimo-xential-configuration',
   templateUrl: './xential-configuration.component.html',
-  styleUrls: ['./xential-configuration.component.scss'],
 })
 export class XentialConfigurationComponent
   implements PluginConfigurationComponent, OnInit, OnDestroy
@@ -37,9 +34,6 @@ export class XentialConfigurationComponent
   @Output() configuration: EventEmitter<PluginConfigurationData> = new EventEmitter<PluginConfigurationData>();
 
   constructor(
-      private readonly pluginManagementService: PluginManagementService,
-      private readonly translateService: TranslateService,
-      private readonly pluginTranslationService: PluginTranslationService
   ) {}
 
   private saveSubscription!: Subscription;

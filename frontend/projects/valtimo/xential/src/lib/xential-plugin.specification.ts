@@ -17,25 +17,55 @@
 import {PluginSpecification} from '@valtimo/plugin';
 import {XentialConfigurationComponent} from './components/xential-configuration/xential-configuration.component';
 import {XENTIAL_PLUGIN_LOGO_BASE64} from './assets';
+import {
+    GenerateDocumentConfigurationComponent
+} from "./components/generate-document-configuration/generate-document-configuration.component";
 
 const XentialPluginSpecification: PluginSpecification = {
-  pluginId: 'xential',
-  pluginConfigurationComponent: XentialConfigurationComponent,
-  pluginLogoBase64: XENTIAL_PLUGIN_LOGO_BASE64,
-  pluginTranslations: {
-    nl: {
-      title: 'Xential',
-      description: 'Xential plugin',
+    pluginId: 'xential',
+    pluginConfigurationComponent: XentialConfigurationComponent,
+    pluginLogoBase64: XENTIAL_PLUGIN_LOGO_BASE64,
+    functionConfigurationComponents: {
+        'generate-document': GenerateDocumentConfigurationComponent
     },
-    en: {
-      title: 'Xential',
-      description: 'Xential plugin',
+    pluginTranslations: {
+        nl: {
+            title: 'Xential',
+            description: 'Xential plugin',
+            configurationTitle: 'Configuratie naam',
+            clientId: 'Taak applicatie naam',
+            clientPassword: 'Taak applicatie wachtwoord',
+            'generate-document': 'Genereer document',
+            templateId: 'Template ID',
+            fileFormat: 'Bestandsformaat',
+            documentId: 'Document kenmerk',
+            templateData: 'Sjabloon vuldata',
+        },
+        en: {
+            title: 'Xential',
+            description: 'Xential plugin',
+            configurationTitle: 'Configuration name',
+            clientId: 'Client ID',
+            clientPassword: 'Client password',
+            'generate-document': 'Generate document',
+            templateId: 'Sjabloon ID',
+            fileFormat: 'File format',
+            documentId: 'Document ID',
+            templateData: 'Template data',
+        },
+        de: {
+            title: 'Xential',
+            description: 'Xential plugin',
+            configurationTitle: 'Konfigurationsname',
+            clientId: 'Kunden-ID',
+            clientPassword: 'Kundenpasswort',
+            'generate-document': 'Dokument generieren',
+            templateId: 'Vorlage ID',
+            fileFormat: 'Dateiformat',
+            documentId: 'Dokument-ID',
+            templateData: 'Vorlagendaten',
+        },
     },
-    de: {
-      title: 'Xential',
-      description: 'Xential plugin',
-    },
-  },
 };
 
 export {XentialPluginSpecification};

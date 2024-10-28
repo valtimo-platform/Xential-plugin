@@ -18,12 +18,17 @@ package com.ritense.valtimo.xential.plugin
 
 import com.ritense.plugin.PluginFactory
 import com.ritense.plugin.service.PluginService
+import com.ritense.valtimo.xential.repository.XentialTokenRepository
+import com.ritense.valtimo.xential.service.DocumentGenerationService
+import com.rotterdam.xential.api.DefaultApi
+import org.springframework.web.client.RestClient
 
 class XentialPluginFactory(
     pluginService: PluginService,
+    val documentGenerationService: DocumentGenerationService
 ) : PluginFactory<XentialPlugin>(pluginService) {
 
     override fun create(): XentialPlugin {
-        return XentialPlugin()
+        return XentialPlugin(documentGenerationService)
     }
 }
