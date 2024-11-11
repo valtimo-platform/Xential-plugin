@@ -1,5 +1,6 @@
 package com.ritense.valtimo.xential.domain
 
+import com.ritense.valtimo.xential.plugin.TemplateDataEntry
 import java.util.UUID
 
 data class GenerateDocumentProperties(
@@ -7,5 +8,5 @@ data class GenerateDocumentProperties(
     val fileFormat: FileFormat,
     val documentId: String,
     val messageName: String,
-    val templateData: Map<String, String>
+    val templateData: Array<TemplateDataEntry>
 )

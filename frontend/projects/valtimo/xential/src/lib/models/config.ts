@@ -23,4 +23,12 @@ interface XentialConfig extends PluginConfigurationData {
     documentenApiPluginConfiguration: string
 }
 
+interface SendMailConfig {
+    mailSendTaskFrom: string;
+    mailSendTaskTemplate: string;
+    mailSendTaskSubject: string;
+    mailSendTaskTo: string;
+    templateData: Array<{key: string; value: string}>;
+}
+
 export {XentialConfig};

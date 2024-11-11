@@ -1,6 +1,5 @@
 package com.ritense.valtimo.xential.service
 
-import com.ritense.documentenapi.DocumentenApiPlugin
 import com.ritense.documentenapi.client.CreateDocumentRequest
 import com.ritense.documentenapi.client.DocumentStatusType
 import com.ritense.documentenapi.client.DocumentenApiClient
@@ -9,18 +8,19 @@ import com.ritense.plugin.service.PluginService
 import com.ritense.valtimo.xential.domain.DocumentCreatedMessage
 import com.ritense.valtimo.xential.domain.GenerateDocumentProperties
 import com.ritense.valtimo.xential.domain.XentialToken
+import com.ritense.valtimo.xential.plugin.TemplateDataEntry
 import com.ritense.valtimo.xential.plugin.XentialPlugin
 import com.ritense.valtimo.xential.repository.XentialTokenRepository
+import com.ritense.valueresolver.ValueResolverService
 import com.ritense.zakenapi.ZaakUrlProvider
-import com.ritense.zakenapi.ZakenApiPlugin
 import com.ritense.zakenapi.client.LinkDocumentRequest
 import com.ritense.zakenapi.client.ZakenApiClient
 import com.rotterdam.xential.api.DefaultApi
 import com.rotterdam.xential.model.Sjabloondata
 import org.camunda.bpm.engine.RuntimeService
+import org.camunda.bpm.engine.delegate.DelegateExecution
 import org.openapitools.client.infrastructure.ApiClient
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.security.core.context.SecurityContextHolder
 import java.io.ByteArrayInputStream
 import java.time.LocalDate
 import java.util.Base64
@@ -35,6 +35,7 @@ class DocumentGenerationService(
     val zaakUrlProvider: ZaakUrlProvider,
     val zakenApiClient: ZakenApiClient,
     val runtimeService: RuntimeService,
+    val valueResolverService: ValueResolverService
     ) {
 
     fun generateDocument(
@@ -42,8 +43,11 @@ class DocumentGenerationService(
         generateDocumentProperties: GenerateDocumentProperties,
         clientId: String,
         clientPassword: String,
+        execution: DelegateExecution,
     ) {
-        val sjabloonVulData = generateDocumentProperties.templateData.entries.map { "<${it.key}>${it.value}</${it.key}>" }.joinToString()
+
+        val resolvedMap = resolveTemplateData(generateDocumentProperties.templateData,execution)
+        val sjabloonVulData = resolvedMap.map { "<${it.key}>${it.value}</${it.key}>" }.joinToString()
 
         ApiClient.username = clientId
         ApiClient.password = clientPassword
@@ -83,6 +87,7 @@ class DocumentGenerationService(
                 bronorganisatie = documentenApiPlugin.bronorganisatie,
                 creatiedatum = LocalDate.now(),
                 titel = message.documentkenmerk,
+                vertrouwelijkheidaanduiding = null,
                 auteur = message.gebruiker,
                 status = DocumentStatusType.DEFINITIEF,
                 taal = "nld",
@@ -126,6 +131,18 @@ class DocumentGenerationService(
                 .processInstanceId(xentialToken.processId.toString())
                 .correlate()
         }
+    }
+
+    private fun resolveTemplateData(
+        templateData: Array<TemplateDataEntry>,
+        execution: DelegateExecution
+    ): Map<String, Any?> {
+        val placeHolderValueMap = valueResolverService.resolveValues(
+            execution.processInstanceId,
+            execution,
+            templateData.map { it.value }.toList()
+        )
+        return templateData.associate { it.key to placeHolderValueMap.getOrDefault(it.value, null) }
     }
 
     private fun getXentialPlugin(message: DocumentCreatedMessage): XentialPlugin {

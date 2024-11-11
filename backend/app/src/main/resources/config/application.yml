@@ -118,3 +118,8 @@ keycloak:
     resource: valtimo-user-m2m-client
     credentials:
         secret: 6ef6ca16-6b86-482a-a3d9-0561704c1db9
+
+
+plugin:
+    xential:
+        baseurl: http://localhost:1080

@@ -69,4 +69,6 @@ bootRun {
             }
         }
     }
+    args("-Peeen=eeen")
+    args("-Dtwee=twee")
 }

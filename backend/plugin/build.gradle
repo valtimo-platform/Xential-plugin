@@ -52,7 +52,7 @@ dependencies {
     implementation "com.ritense.valtimo:openzaak-plugin-authentication:${valtimoVersion}"
     implementation "com.ritense.valtimo:zaken-api:${valtimoVersion}"
     implementation "com.ritense.valtimo:documenten-api:${valtimoVersion}"
-
+    implementation "com.ritense.valtimo:zgw:${valtimoVersion}"
     implementation "org.springframework.boot:spring-boot-starter-webflux:${springVersion}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springVersion}"
 
@@ -122,8 +122,8 @@ test {
     useJUnitPlatform()
 }
 
-sourceCompatibility = 20
-targetCompatibility = 20
+sourceCompatibility = 21
+targetCompatibility = 21
 
 apply plugin: "com.avast.gradle.docker-compose"
 

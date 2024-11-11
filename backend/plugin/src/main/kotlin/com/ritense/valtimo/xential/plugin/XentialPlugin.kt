@@ -17,19 +17,16 @@
 package com.ritense.valtimo.xential.plugin
 
 import com.ritense.documentenapi.DocumentenApiPlugin
-import com.ritense.openzaak.plugin.OpenZaakPlugin
 import com.ritense.plugin.annotation.Plugin
 import com.ritense.plugin.annotation.PluginAction
+import com.ritense.plugin.annotation.PluginActionProperty
 import com.ritense.plugin.annotation.PluginProperty
 import com.ritense.processlink.domain.ActivityTypeWithEventName
+import com.ritense.valtimo.xential.domain.FileFormat
 import com.ritense.valtimo.xential.domain.GenerateDocumentProperties
-import com.ritense.valtimo.xential.domain.XentialToken
 import com.ritense.valtimo.xential.plugin.XentialPlugin.Companion.PLUGIN_KEY
-import com.ritense.valtimo.xential.repository.XentialTokenRepository
 import com.ritense.valtimo.xential.service.DocumentGenerationService
 import com.ritense.zakenapi.ZakenApiPlugin
-import com.rotterdam.xential.api.DefaultApi
-import com.rotterdam.xential.model.Sjabloondata
 import org.camunda.bpm.engine.delegate.DelegateExecution
 import java.util.UUID
 
@@ -54,18 +51,34 @@ class XentialPlugin(
     @PluginProperty(key = "zakenApiPluginConfiguration", secret = false)
     lateinit var zakenApiPluginConfiguration: ZakenApiPlugin
 
+
     @PluginAction(
         key = "generate-document",
         title = "Generate document",
         description = "Generate a document using xential.",
         activityTypes = [ActivityTypeWithEventName.SERVICE_TASK_START]
     )
-    fun generateDocument(execution: DelegateExecution, generateDocumentProperties: GenerateDocumentProperties) {
+    fun generateDocument(
+        @PluginActionProperty templateId: UUID,
+        @PluginActionProperty fileFormat: FileFormat,
+        @PluginActionProperty documentId: String,
+        @PluginActionProperty messageName: String,
+        @PluginActionProperty templateData: Array<TemplateDataEntry>,
+        execution: DelegateExecution
+    ) {
+        val generateDocumentProperties = GenerateDocumentProperties(
+            templateId,
+            fileFormat,
+            documentId,
+            messageName,
+            templateData
+        )
         documentGenerationService.generateDocument(
             UUID.fromString(execution.processInstanceId),
             generateDocumentProperties,
             clientId,
-            clientPassword
+            clientPassword,
+            execution
         )
     }
 
