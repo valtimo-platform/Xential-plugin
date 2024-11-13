@@ -15,60 +15,103 @@
  */
 
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {PluginConfigurationComponent, PluginConfigurationData} from '@valtimo/plugin';
-import {BehaviorSubject, combineLatest, Observable, Subscription, take} from 'rxjs';
+import {
+    PluginConfigurationComponent,
+    PluginConfigurationData,
+    PluginManagementService,
+    PluginTranslationService
+} from '@valtimo/plugin';
+import {BehaviorSubject, combineLatest, map, Observable, Subscription, take} from 'rxjs';
 import {XentialConfig} from '../../models';
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
-  selector: 'valtimo-xential-configuration',
-  templateUrl: './xential-configuration.component.html',
+    selector: 'valtimo-xential-configuration',
+    templateUrl: './xential-configuration.component.html',
 })
 export class XentialConfigurationComponent
-  implements PluginConfigurationComponent, OnInit, OnDestroy
-{
-  @Input() save$!: Observable<void>;
-  @Input() disabled$!: Observable<boolean>;
-  @Input() pluginId!: string;
-  @Input() prefillConfiguration$!: Observable<XentialConfig>;
-  @Output() valid: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() configuration: EventEmitter<PluginConfigurationData> = new EventEmitter<PluginConfigurationData>();
+    implements PluginConfigurationComponent, OnInit, OnDestroy {
+    @Input() save$!: Observable<void>;
+    @Input() disabled$!: Observable<boolean>;
+    @Input() pluginId!: string;
+    @Input() prefillConfiguration$!: Observable<XentialConfig>;
+    @Output() valid: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output() configuration: EventEmitter<PluginConfigurationData> = new EventEmitter<PluginConfigurationData>();
 
-  constructor(
-  ) {}
+    private saveSubscription!: Subscription;
+    private readonly formValue$ = new BehaviorSubject<XentialConfig | null>(null);
+    private readonly valid$ = new BehaviorSubject<boolean>(false);
 
-  private saveSubscription!: Subscription;
-  private readonly formValue$ = new BehaviorSubject<XentialConfig | null>(null);
-  private readonly valid$ = new BehaviorSubject<boolean>(false);
+    readonly zakenApiPluginSelectItems$: Observable<Array<{ id: string; text: string }>> =
+        combineLatest([
+            this.pluginManagementService.getPluginConfigurationsByPluginDefinitionKey('zakenapi'),
+            this.translateService.stream('key'),
+        ]).pipe(
+            map(([configurations]) =>
+                configurations.map(configuration => ({
+                    id: configuration.id,
+                    text: `${configuration.title} - ${this.pluginTranslationService.instant(
+                        'title',
+                        configuration.pluginDefinition.key
+                    )}`,
+                }))
+            )
+        );
 
-  ngOnInit(): void {
-    this.openSaveSubscription();
-  }
 
-  ngOnDestroy() {
-    this.saveSubscription?.unsubscribe();
-  }
+    readonly documentenApiPluginSelectItems$: Observable<Array<{ id: string; text: string }>> =
+        combineLatest([
+            this.pluginManagementService.getPluginConfigurationsByPluginDefinitionKey('documentenapi'),
+            this.translateService.stream('key'),
+        ]).pipe(
+            map(([configurations]) =>
+                configurations.map(configuration => ({
+                    id: configuration.id,
+                    text: `${configuration.title} - ${this.pluginTranslationService.instant(
+                        'title',
+                        configuration.pluginDefinition.key
+                    )}`,
+                }))
+            )
+        );
 
-  formValueChange(formValue: XentialConfig): void {
-    this.formValue$.next(formValue);
-    this.handleValid(formValue);
-  }
+    constructor(
+        private readonly pluginManagementService: PluginManagementService,
+        private readonly translateService: TranslateService,
+        private readonly pluginTranslationService: PluginTranslationService
+    ) {
+    }
 
-  private handleValid(formValue: XentialConfig): void {
-    const valid = !!(formValue);
 
-    this.valid$.next(valid);
-    this.valid.emit(valid);
-  }
+    ngOnInit(): void {
+        this.openSaveSubscription();
+    }
 
-  private openSaveSubscription(): void {
-    this.saveSubscription = this.save$?.subscribe(save => {
-      combineLatest([this.formValue$, this.valid$])
-        .pipe(take(1))
-        .subscribe(([formValue, valid]) => {
-          if (valid) {
-            this.configuration.emit(formValue!);
-          }
+    ngOnDestroy() {
+        this.saveSubscription?.unsubscribe();
+    }
+
+    formValueChange(formValue: XentialConfig): void {
+        this.formValue$.next(formValue);
+        this.handleValid(formValue);
+    }
+
+    private handleValid(formValue: XentialConfig): void {
+        const valid = !!(formValue);
+
+        this.valid$.next(valid);
+        this.valid.emit(valid);
+    }
+
+    private openSaveSubscription(): void {
+        this.saveSubscription = this.save$?.subscribe(save => {
+            combineLatest([this.formValue$, this.valid$])
+                .pipe(take(1))
+                .subscribe(([formValue, valid]) => {
+                    if (valid) {
+                        this.configuration.emit(formValue!);
+                    }
+                });
         });
-    });
-  }
+    }
 }

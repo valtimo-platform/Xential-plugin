@@ -49,7 +49,10 @@ dependencies {
     implementation "com.ritense.valtimo:plugin-valtimo:${valtimoVersion}"
     implementation "com.ritense.valtimo:temporary-resource-storage:${valtimoVersion}"
     implementation "com.ritense.valtimo:value-resolver:${valtimoVersion}"
-
+    implementation "com.ritense.valtimo:openzaak-plugin-authentication:${valtimoVersion}"
+    implementation "com.ritense.valtimo:zaken-api:${valtimoVersion}"
+    implementation "com.ritense.valtimo:documenten-api:${valtimoVersion}"
+    implementation "com.ritense.valtimo:zgw:${valtimoVersion}"
     implementation "org.springframework.boot:spring-boot-starter-webflux:${springVersion}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springVersion}"
 
@@ -119,7 +122,8 @@ test {
     useJUnitPlatform()
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_22
+sourceCompatibility = 21
+targetCompatibility = 21
 
 apply plugin: "com.avast.gradle.docker-compose"
 

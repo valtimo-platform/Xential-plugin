@@ -14,7 +14,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.openapitools.client.infrastructure.ApiClient
 import java.util.UUID
 
 class DocumentGenerationServiceTest {
@@ -56,6 +55,7 @@ class DocumentGenerationServiceTest {
             generateDocumentProperties,
             "client-id",
             "client-password",
+            execution,
         )
 
         verify(xentialTokenRepository).save(XentialToken(

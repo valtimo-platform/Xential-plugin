@@ -15,6 +15,8 @@ data class XentialToken (
     val token: UUID,
     @Column(name = "process_id", nullable = false, updatable = false)
     val processId: UUID,
+    @Column(name = "message_name", nullable = false, updatable = false)
+    val messageName: String,
     @Column(name = "resume_url", nullable = true, updatable = false)
     val resumeUrl: URI?,
 )
