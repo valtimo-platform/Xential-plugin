@@ -34,10 +34,11 @@ import java.util.UUID
 @Plugin(
     key = PLUGIN_KEY,
     title = "Xential Plugin",
-    description = ""
+    description = "handle xentail requests"
 )
+@Suppress("UNUSED")
 class XentialPlugin(
-    val documentGenerationService: DocumentGenerationService
+    private val documentGenerationService: DocumentGenerationService
 ) {
 
     @PluginProperty(key = "applicationName", secret = false, required = true)

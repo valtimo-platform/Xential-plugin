@@ -23,8 +23,6 @@ import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import org.camunda.bpm.engine.RuntimeService
 import org.camunda.bpm.engine.delegate.DelegateExecution
-import org.hibernate.validator.internal.util.logging.LoggerFactory
-import org.openapitools.client.infrastructure.ApiClient
 import org.springframework.context.ApplicationEventPublisher
 import java.io.ByteArrayInputStream
 import java.net.URI
