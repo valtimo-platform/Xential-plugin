@@ -33,7 +33,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-import org.springframework.web.reactive.function.client.WebClient
 
 @AutoConfiguration
 @EnableJpaRepositories(basePackages = ["com.ritense.valtimo.xential.repository"])
@@ -57,22 +56,6 @@ class XentialAutoConfiguration {
     fun xentialLiquibaseMasterChangeLogLocation(): LiquibaseMasterChangeLogLocation {
         return LiquibaseMasterChangeLogLocation("config/liquibase/xential-plugin-master.xml")
     }
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    fun defaultApi(): DefaultApi {
-//        return DefaultApi()
-//    }
-
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    fun apiClient(
-//    @Value("\${plugin.xential.baseurl: }") baseUrl: String
-//    ) = ApiClient(
-//        baseUrl
-        //baseUrl = "http://localhost:1080"
-//    )
 
     @Bean
     @ConditionalOnMissingBean
