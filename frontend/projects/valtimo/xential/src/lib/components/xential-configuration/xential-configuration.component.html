@@ -31,18 +31,32 @@
     >
     </v-input>
     <v-input
-            type="text"
-            required="true"
-            name="clientId"
-            [defaultValue]="obs.prefill?.clientId"
-            [title]="'clientId' | pluginTranslate: pluginId | async">
-    </v-input>
+            name="applicationName"
+            [title]="'applicationName' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.applicationName"
+            [disabled]="obs.disabled"
+            [required]="true"
+    ></v-input>
     <v-input
-            type="text"
-            required="true"
-            name="clientPassword"
-            [defaultValue]="obs.prefill?.clientPassword"
-            [title]="'clientPassword' | pluginTranslate: pluginId | async">
+            name="applicationPassword"
+            [title]="'applicationPassword' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.applicationPassword"
+            [disabled]="obs.disabled"
+            [required]="true"
+    ></v-input>
+    <v-input
+            name="baseUrl"
+            [title]="'baseUrl' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.baseUrl"
+            [disabled]="obs.disabled"
+            [required]="true"
+    >
     </v-input>
     <hr/>
     <ng-container

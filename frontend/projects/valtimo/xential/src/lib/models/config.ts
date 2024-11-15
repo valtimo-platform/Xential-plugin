@@ -17,18 +17,11 @@
 import {PluginConfigurationData} from '@valtimo/plugin';
 
 interface XentialConfig extends PluginConfigurationData {
-    clientId: string;
-    clientPassword: string;
+    applicationName: string;
+    applicationPassword: string;
+    baseUrl: string;
     zakenApiPluginConfiguration: string;
     documentenApiPluginConfiguration: string
-}
-
-interface SendMailConfig {
-    mailSendTaskFrom: string;
-    mailSendTaskTemplate: string;
-    mailSendTaskSubject: string;
-    mailSendTaskTo: string;
-    templateData: Array<{key: string; value: string}>;
 }
 
 export {XentialConfig};

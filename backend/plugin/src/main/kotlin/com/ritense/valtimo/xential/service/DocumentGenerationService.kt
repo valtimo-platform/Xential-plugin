@@ -5,6 +5,7 @@ import com.ritense.documentenapi.client.DocumentStatusType
 import com.ritense.documentenapi.client.DocumentenApiClient
 import com.ritense.documentenapi.event.DocumentCreated
 import com.ritense.plugin.service.PluginService
+import com.ritense.valtimo.contract.authentication.UserManagementService
 import com.ritense.valtimo.xential.domain.DocumentCreatedMessage
 import com.ritense.valtimo.xential.domain.GenerateDocumentProperties
 import com.ritense.valtimo.xential.domain.XentialToken
@@ -17,17 +18,21 @@ import com.ritense.zakenapi.client.LinkDocumentRequest
 import com.ritense.zakenapi.client.ZakenApiClient
 import com.rotterdam.xential.api.DefaultApi
 import com.rotterdam.xential.model.Sjabloondata
+import mu.KotlinLogging
+import okhttp3.Credentials
+import okhttp3.OkHttpClient
 import org.camunda.bpm.engine.RuntimeService
 import org.camunda.bpm.engine.delegate.DelegateExecution
+import org.hibernate.validator.internal.util.logging.LoggerFactory
 import org.openapitools.client.infrastructure.ApiClient
 import org.springframework.context.ApplicationEventPublisher
 import java.io.ByteArrayInputStream
+import java.net.URI
 import java.time.LocalDate
 import java.util.Base64
 import java.util.UUID
 
 class DocumentGenerationService(
-    val defaultApi: DefaultApi,
     val xentialTokenRepository: XentialTokenRepository,
     val pluginService: PluginService,
     val documentenApiClient: DocumentenApiClient,
@@ -35,24 +40,26 @@ class DocumentGenerationService(
     val zaakUrlProvider: ZaakUrlProvider,
     val zakenApiClient: ZakenApiClient,
     val runtimeService: RuntimeService,
-    val valueResolverService: ValueResolverService
+    val valueResolverService: ValueResolverService,
+    val userManagementService: UserManagementService
     ) {
 
     fun generateDocument(
+        applicationName: String,
+        applicationPassword: String,
+        baseUrl: URI,
         processId: UUID,
         generateDocumentProperties: GenerateDocumentProperties,
-        clientId: String,
-        clientPassword: String,
         execution: DelegateExecution,
     ) {
-
+        logger.info { "current userid: ${userManagementService.currentUserId}" }
+        val api = configureClient(
+            applicationName, applicationPassword, baseUrl
+        )
         val resolvedMap = resolveTemplateData(generateDocumentProperties.templateData,execution)
         val sjabloonVulData = resolvedMap.map { "<${it.key}>${it.value}</${it.key}>" }.joinToString()
-
-        ApiClient.username = clientId
-        ApiClient.password = clientPassword
-        val result = defaultApi.creeerDocument(
-            gebruikersId = clientId,
+        val result = api.creeerDocument(
+            gebruikersId = userManagementService.currentUserId,
             accepteerOnbekend = false,
             sjabloondata = Sjabloondata(
                 sjabloonId = generateDocumentProperties.templateId.toString(),
@@ -61,15 +68,32 @@ class DocumentGenerationService(
                 sjabloonVulData = "<root>$sjabloonVulData</root>"
             )
         )
-
+        logger.info { "found something: $result" }
         val xentialToken = XentialToken(
             token = UUID.fromString(result.documentCreatieSessieId),
+            externalToken = result.documentCreatieSessieId,
             processId = processId,
             messageName = generateDocumentProperties.messageName,
-            resumeUrl = result.resumeUrl
+            resumeUrl = result.resumeUrl.toString()
         )
-
+        logger.info { "token: ${xentialToken.token}" }
+        logger.info { "token: ${xentialToken.processId}" }
         xentialTokenRepository.save(xentialToken)
+        logger.info { "ready" }
+    }
+
+    private fun configureClient(applicationName: String, applicationPassword: String, baseUrl: URI): DefaultApi {
+        val credentials = Credentials.basic(applicationName, applicationPassword)
+        val customClient = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("Authorization", credentials)
+                    .build()
+                chain.proceed(request)
+            }
+            .build()
+
+        return DefaultApi(baseUrl.toString(), customClient)
     }
 
     fun onDocumentGenerated(message: DocumentCreatedMessage) {
@@ -150,5 +174,8 @@ class DocumentGenerationService(
         val pluginConfig = pluginService.findPluginConfiguration(XentialPlugin.PLUGIN_KEY) { _ -> true}
             ?: throw NoSuchElementException("Could not find Xential plugin")
         return pluginService.createInstance(pluginConfig) as XentialPlugin
+    }
+    companion object{
+        private val logger =  KotlinLogging.logger {}
     }
 }

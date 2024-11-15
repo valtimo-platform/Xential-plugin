@@ -2,6 +2,7 @@ interface GenerateDocumentConfig {
     templateId: string;
     fileFormat: FileFormat;
     documentId: string;
+    messageName: "sfsefef"
     templateData: Array<{key: string; value: string}>
 }
 

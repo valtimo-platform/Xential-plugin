@@ -28,6 +28,7 @@ import com.ritense.valtimo.xential.plugin.XentialPlugin.Companion.PLUGIN_KEY
 import com.ritense.valtimo.xential.service.DocumentGenerationService
 import com.ritense.zakenapi.ZakenApiPlugin
 import org.camunda.bpm.engine.delegate.DelegateExecution
+import java.net.URI
 import java.util.UUID
 
 @Plugin(
@@ -39,18 +40,20 @@ class XentialPlugin(
     val documentGenerationService: DocumentGenerationService
 ) {
 
-    @PluginProperty(key = "clientId", secret = false)
-    private lateinit var clientId: String
+    @PluginProperty(key = "applicationName", secret = false, required = true)
+    private lateinit var applicationName: String
 
-    @PluginProperty(key = "clientPassword", secret = true)
-    private lateinit var clientPassword: String
+    @PluginProperty(key = "applicationPassword", secret = true, required = true)
+    private lateinit var applicationPassword: String
+
+    @PluginProperty(key = "baseUrl", secret = false, required = true)
+    lateinit var baseUrl: URI
 
     @PluginProperty(key = "documentenApiPluginConfiguration", secret = false)
     lateinit var documentenApiPluginConfiguration: DocumentenApiPlugin
 
     @PluginProperty(key = "zakenApiPluginConfiguration", secret = false)
     lateinit var zakenApiPluginConfiguration: ZakenApiPlugin
-
 
     @PluginAction(
         key = "generate-document",
@@ -74,10 +77,11 @@ class XentialPlugin(
             templateData
         )
         documentGenerationService.generateDocument(
+            applicationName,
+            applicationPassword,
+            baseUrl,
             UUID.fromString(execution.processInstanceId),
             generateDocumentProperties,
-            clientId,
-            clientPassword,
             execution
         )
     }
