@@ -97,7 +97,14 @@ export class XentialConfigurationComponent
     }
 
     private handleValid(formValue: XentialConfig): void {
-        const valid = !!(formValue);
+        const valid = !!(
+            formValue.applicationName &&
+            formValue.applicationPassword &&
+            formValue.baseUrl &&
+            formValue.serverCertificateFilename &&
+            formValue.zakenApiPluginConfiguration &&
+            formValue.documentenApiPluginConfiguration
+        );
 
         this.valid$.next(valid);
         this.valid.emit(valid);

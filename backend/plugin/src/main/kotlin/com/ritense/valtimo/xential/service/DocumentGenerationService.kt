@@ -6,6 +6,7 @@ import com.ritense.documentenapi.client.DocumentenApiClient
 import com.ritense.documentenapi.event.DocumentCreated
 import com.ritense.plugin.service.PluginService
 import com.ritense.valtimo.contract.authentication.UserManagementService
+import com.ritense.valtimo.xential.domain.HttpClientProperties
 import com.ritense.valtimo.xential.domain.DocumentCreatedMessage
 import com.ritense.valtimo.xential.domain.GenerateDocumentProperties
 import com.ritense.valtimo.xential.domain.XentialToken
@@ -25,36 +26,42 @@ import org.camunda.bpm.engine.RuntimeService
 import org.camunda.bpm.engine.delegate.DelegateExecution
 import org.springframework.context.ApplicationEventPublisher
 import java.io.ByteArrayInputStream
-import java.net.URI
+import java.io.File
+import java.io.FileInputStream
+import java.security.KeyFactory
+import java.security.KeyStore
+import java.security.cert.CertificateFactory
+import java.security.spec.PKCS8EncodedKeySpec
 import java.time.LocalDate
-import java.util.Base64
-import java.util.UUID
+import java.util.*
+import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
+
 
 class DocumentGenerationService(
-    val xentialTokenRepository: XentialTokenRepository,
-    val pluginService: PluginService,
-    val documentenApiClient: DocumentenApiClient,
-    val applicationEventPublisher: ApplicationEventPublisher,
-    val zaakUrlProvider: ZaakUrlProvider,
-    val zakenApiClient: ZakenApiClient,
-    val runtimeService: RuntimeService,
-    val valueResolverService: ValueResolverService,
-    val userManagementService: UserManagementService
-    ) {
+    private val xentialTokenRepository: XentialTokenRepository,
+    private val pluginService: PluginService,
+    private val documentenApiClient: DocumentenApiClient,
+    private val applicationEventPublisher: ApplicationEventPublisher,
+    private val zaakUrlProvider: ZaakUrlProvider,
+    private val zakenApiClient: ZakenApiClient,
+    private val runtimeService: RuntimeService,
+    private val valueResolverService: ValueResolverService,
+    private val userManagementService: UserManagementService
+) {
 
     fun generateDocument(
-        applicationName: String,
-        applicationPassword: String,
-        baseUrl: URI,
+        httpClientProperties: HttpClientProperties,
         processId: UUID,
         generateDocumentProperties: GenerateDocumentProperties,
         execution: DelegateExecution,
     ) {
         logger.info { "current userid: ${userManagementService.currentUserId}" }
-        val api = configureClient(
-            applicationName, applicationPassword, baseUrl
-        )
-        val resolvedMap = resolveTemplateData(generateDocumentProperties.templateData,execution)
+
+        val api = configureClient(httpClientProperties)
+        val resolvedMap = resolveTemplateData(generateDocumentProperties.templateData, execution)
         val sjabloonVulData = resolvedMap.map { "<${it.key}>${it.value}</${it.key}>" }.joinToString()
         val result = api.creeerDocument(
             gebruikersId = userManagementService.currentUserId,
@@ -75,13 +82,58 @@ class DocumentGenerationService(
             resumeUrl = result.resumeUrl.toString()
         )
         logger.info { "token: ${xentialToken.token}" }
-        logger.info { "token: ${xentialToken.processId}" }
         xentialTokenRepository.save(xentialToken)
         logger.info { "ready" }
     }
 
-    private fun configureClient(applicationName: String, applicationPassword: String, baseUrl: URI): DefaultApi {
-        val credentials = Credentials.basic(applicationName, applicationPassword)
+    private fun trustManagerFactory(certFile: File): TrustManagerFactory {
+
+        // Load the server certificate
+        val certificateFactory = CertificateFactory.getInstance("X.509")
+        val serverCert = certificateFactory.generateCertificate(FileInputStream(certFile))
+
+        // Create a KeyStore with the server certificate
+        val trustStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+            load(null, null)
+            setCertificateEntry("server", serverCert)
+        }
+
+        // Configure the TrustManager
+        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        trustManagerFactory.init(trustStore)
+        return trustManagerFactory
+    }
+
+    private fun keyManagerFactory(privateKeyFile: File?, clientCertFile: File?): KeyManagerFactory? {
+        return if (privateKeyFile != null && clientCertFile != null) {
+            val certificateFactory = CertificateFactory.getInstance("X.509")
+            val clientCert = certificateFactory.generateCertificate(FileInputStream(clientCertFile))
+            val privateKey = loadPrivateKey(privateKeyFile)
+
+            // Create a KeyStore with the client certificate and private key
+            val keyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+                load(null, null)
+                setKeyEntry("client", privateKey, null, arrayOf(clientCert))
+            }
+
+            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()).apply {
+                init(keyStore, null)
+            }
+        } else null
+    }
+
+    private fun configureClient(properties: HttpClientProperties): DefaultApi {
+        val trustManagerFactory = trustManagerFactory(properties.serverCertificateFilename)
+        val keyManagerFactory = keyManagerFactory(
+            properties.clientPrivateKeyFilename,
+            properties.clientCertFile
+        )
+
+        val sslContext = SSLContext.getInstance("TLS").apply {
+            init(keyManagerFactory?.keyManagers, trustManagerFactory.trustManagers, null)
+        }
+
+        val credentials = Credentials.basic(properties.applicationName, properties.applicationPassword)
         val customClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
@@ -89,9 +141,21 @@ class DocumentGenerationService(
                     .build()
                 chain.proceed(request)
             }
+            .sslSocketFactory(sslContext.socketFactory, trustManagerFactory.trustManagers[0] as X509TrustManager)
             .build()
 
-        return DefaultApi(baseUrl.toString(), customClient)
+        return DefaultApi(properties.baseUrl.toString(), customClient)
+    }
+
+    private fun loadPrivateKey(file: File): java.security.PrivateKey {
+        val keyBytes = file.readText()
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .replace("\\s".toRegex(), "")
+            .let { Base64.getDecoder().decode(it) }
+
+        val keySpec = PKCS8EncodedKeySpec(keyBytes)
+        return KeyFactory.getInstance("RSA").generatePrivate(keySpec)
     }
 
     fun onDocumentGenerated(message: DocumentCreatedMessage) {
@@ -169,11 +233,12 @@ class DocumentGenerationService(
 
     private fun getXentialPlugin(message: DocumentCreatedMessage): XentialPlugin {
         //FIXME needs a way of determining the right plugin
-        val pluginConfig = pluginService.findPluginConfiguration(XentialPlugin.PLUGIN_KEY) { _ -> true}
+        val pluginConfig = pluginService.findPluginConfiguration(XentialPlugin.PLUGIN_KEY) { _ -> true }
             ?: throw NoSuchElementException("Could not find Xential plugin")
         return pluginService.createInstance(pluginConfig) as XentialPlugin
     }
-    companion object{
-        private val logger =  KotlinLogging.logger {}
+
+    companion object {
+        private val logger = KotlinLogging.logger {}
     }
 }

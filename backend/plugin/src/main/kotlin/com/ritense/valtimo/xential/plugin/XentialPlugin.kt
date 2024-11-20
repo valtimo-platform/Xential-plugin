@@ -22,12 +22,14 @@ import com.ritense.plugin.annotation.PluginAction
 import com.ritense.plugin.annotation.PluginActionProperty
 import com.ritense.plugin.annotation.PluginProperty
 import com.ritense.processlink.domain.ActivityTypeWithEventName
+import com.ritense.valtimo.xential.domain.HttpClientProperties
 import com.ritense.valtimo.xential.domain.FileFormat
 import com.ritense.valtimo.xential.domain.GenerateDocumentProperties
 import com.ritense.valtimo.xential.plugin.XentialPlugin.Companion.PLUGIN_KEY
 import com.ritense.valtimo.xential.service.DocumentGenerationService
 import com.ritense.zakenapi.ZakenApiPlugin
 import org.camunda.bpm.engine.delegate.DelegateExecution
+import java.io.File
 import java.net.URI
 import java.util.UUID
 
@@ -56,6 +58,15 @@ class XentialPlugin(
     @PluginProperty(key = "zakenApiPluginConfiguration", secret = false)
     lateinit var zakenApiPluginConfiguration: ZakenApiPlugin
 
+    @PluginProperty(key = "serverCertificateFilename", secret = false, required = true)
+    private lateinit var serverCertificateFilename: String
+
+    @PluginProperty(key = "clientPrivateKeyFilename", secret = false, required = false)
+    var clientPrivateKeyFilename: String? = null
+
+    @PluginProperty(key = "clientCertificateFilename", secret = false, required = false)
+    var clientCertificateFilename: String? = null
+
     @PluginAction(
         key = "generate-document",
         title = "Generate document",
@@ -77,10 +88,18 @@ class XentialPlugin(
             messageName,
             templateData
         )
-        documentGenerationService.generateDocument(
+
+        val httpClientProperties = HttpClientProperties(
             applicationName,
             applicationPassword,
             baseUrl,
+            File(serverCertificateFilename),
+            clientPrivateKeyFilename?.let{File(it)},
+            clientCertificateFilename?.let {File(it)}
+        )
+
+        documentGenerationService.generateDocument(
+            httpClientProperties,
             UUID.fromString(execution.processInstanceId),
             generateDocumentProperties,
             execution
