@@ -22,28 +22,35 @@ import com.ritense.plugin.annotation.PluginAction
 import com.ritense.plugin.annotation.PluginActionProperty
 import com.ritense.plugin.annotation.PluginProperty
 import com.ritense.processlink.domain.ActivityTypeWithEventName
+import com.ritense.valtimo.xential.domain.HttpClientProperties
 import com.ritense.valtimo.xential.domain.FileFormat
 import com.ritense.valtimo.xential.domain.GenerateDocumentProperties
 import com.ritense.valtimo.xential.plugin.XentialPlugin.Companion.PLUGIN_KEY
 import com.ritense.valtimo.xential.service.DocumentGenerationService
 import com.ritense.zakenapi.ZakenApiPlugin
 import org.camunda.bpm.engine.delegate.DelegateExecution
+import java.io.File
+import java.net.URI
 import java.util.UUID
 
 @Plugin(
     key = PLUGIN_KEY,
     title = "Xential Plugin",
-    description = ""
+    description = "handle xentail requests"
 )
+@Suppress("UNUSED")
 class XentialPlugin(
-    val documentGenerationService: DocumentGenerationService
+    private val documentGenerationService: DocumentGenerationService
 ) {
 
-    @PluginProperty(key = "clientId", secret = false)
-    private lateinit var clientId: String
+    @PluginProperty(key = "applicationName", secret = false, required = true)
+    private lateinit var applicationName: String
 
-    @PluginProperty(key = "clientPassword", secret = true)
-    private lateinit var clientPassword: String
+    @PluginProperty(key = "applicationPassword", secret = true, required = true)
+    private lateinit var applicationPassword: String
+
+    @PluginProperty(key = "baseUrl", secret = false, required = true)
+    lateinit var baseUrl: URI
 
     @PluginProperty(key = "documentenApiPluginConfiguration", secret = false)
     lateinit var documentenApiPluginConfiguration: DocumentenApiPlugin
@@ -51,6 +58,14 @@ class XentialPlugin(
     @PluginProperty(key = "zakenApiPluginConfiguration", secret = false)
     lateinit var zakenApiPluginConfiguration: ZakenApiPlugin
 
+    @PluginProperty(key = "serverCertificateFilename", secret = false, required = true)
+    private lateinit var serverCertificateFilename: String
+
+    @PluginProperty(key = "clientPrivateKeyFilename", secret = false, required = false)
+    var clientPrivateKeyFilename: String? = null
+
+    @PluginProperty(key = "clientCertificateFilename", secret = false, required = false)
+    var clientCertificateFilename: String? = null
 
     @PluginAction(
         key = "generate-document",
@@ -73,11 +88,20 @@ class XentialPlugin(
             messageName,
             templateData
         )
+
+        val httpClientProperties = HttpClientProperties(
+            applicationName,
+            applicationPassword,
+            baseUrl,
+            File(serverCertificateFilename),
+            clientPrivateKeyFilename?.let{File(it)},
+            clientCertificateFilename?.let {File(it)}
+        )
+
         documentGenerationService.generateDocument(
+            httpClientProperties,
             UUID.fromString(execution.processInstanceId),
             generateDocumentProperties,
-            clientId,
-            clientPassword,
             execution
         )
     }

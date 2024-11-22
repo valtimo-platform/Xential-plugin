@@ -31,18 +31,64 @@
     >
     </v-input>
     <v-input
-            type="text"
-            required="true"
-            name="clientId"
-            [defaultValue]="obs.prefill?.clientId"
-            [title]="'clientId' | pluginTranslate: pluginId | async">
+            name="applicationName"
+            [title]="'applicationName' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.applicationName"
+            [disabled]="obs.disabled"
+            [required]="true"
+    ></v-input>
+    <v-input
+            name="applicationPassword"
+            type="password"
+            [title]="'applicationPassword' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.applicationPassword"
+            [disabled]="obs.disabled"
+            [required]="true"
+    ></v-input>
+    <v-input
+            name="baseUrl"
+            [title]="'baseUrl' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.baseUrl"
+            [disabled]="obs.disabled"
+            [required]="true"
+    >
+    </v-input>
+    <hr/>
+    <v-input
+            name="serverCertificateFilename"
+            [title]="'serverCertificateFilename' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.serverCertificateFilename"
+            [disabled]="obs.disabled"
+            [required]="true"
+    >
     </v-input>
     <v-input
-            type="text"
-            required="true"
-            name="clientPassword"
-            [defaultValue]="obs.prefill?.clientPassword"
-            [title]="'clientPassword' | pluginTranslate: pluginId | async">
+            name="clientPrivateKeyFilename"
+            [title]="'clientPrivateKeyFilename' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.clientPrivateKeyFilename"
+            [disabled]="obs.disabled"
+            [required]="false"
+    >
+    </v-input>
+    <v-input
+            name="clientCertFile"
+            [title]="'clientCertFile' | pluginTranslate: pluginId | async"
+            [margin]="true"
+            [fullWidth]="true"
+            [defaultValue]="obs.prefill?.clientCertFile"
+            [disabled]="obs.disabled"
+            [required]="false"
+    >
     </v-input>
     <hr/>
     <ng-container
