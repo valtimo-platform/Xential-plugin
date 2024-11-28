@@ -22,7 +22,9 @@ import com.ritense.valtimo.contract.authentication.UserManagementService
 import com.ritense.valtimo.contract.config.LiquibaseMasterChangeLogLocation
 import com.ritense.valtimo.xential.plugin.XentialPluginFactory
 import com.ritense.valtimo.xential.repository.XentialTokenRepository
+import com.ritense.valtimo.xential.security.config.XentialApiHttpSecurityConfigurer
 import com.ritense.valtimo.xential.service.DocumentGenerationService
+import com.ritense.valtimo.xential.web.rest.DocumentResource
 import com.ritense.valueresolver.ValueResolverService
 import com.ritense.zakenapi.ZaakUrlProvider
 import com.ritense.zakenapi.client.ZakenApiClient
@@ -32,6 +34,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
+import org.springframework.core.annotation.Order
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @AutoConfiguration
@@ -80,4 +83,17 @@ class XentialAutoConfiguration {
         valueResolverService,
         userManagementService
     )
+
+    @Bean
+    @ConditionalOnMissingBean(DocumentResource::class)
+    fun xentialDocumentResource(documentGenerationService: DocumentGenerationService): DocumentResource {
+        return DocumentResource(documentGenerationService)
+    }
+
+    @Bean
+    @Order(270)
+    @ConditionalOnMissingBean
+    fun xentialApiHttpSecurityConfigurer(): XentialApiHttpSecurityConfigurer {
+        return XentialApiHttpSecurityConfigurer()
+    }
 }

@@ -45,6 +45,9 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.security:spring-security-config")
+    implementation("org.springframework.security:spring-security-web")
+
     implementation "com.ritense.valtimo:core:${valtimoVersion}"
     implementation "com.ritense.valtimo:plugin-valtimo:${valtimoVersion}"
     implementation "com.ritense.valtimo:temporary-resource-storage:${valtimoVersion}"
